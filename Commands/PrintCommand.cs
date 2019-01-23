@@ -38,6 +38,7 @@ namespace PTouchCli.Commands
             document.PrintOut(Count, PrintOptionConstants.bpoDefault);
             document.EndPrint();
 
+            console.WriteLine($"{Count} copies were sent to printer");
             document.Close();
             return 0;
         }

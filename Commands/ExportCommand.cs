@@ -42,6 +42,7 @@ namespace PTouchCli.Commands
                 return 1;
             }
 
+            console.WriteLine($"Label was written to file '{Destination}'");
             document.Close();
             return 0;
         }
