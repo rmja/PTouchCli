@@ -4,8 +4,9 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <ToolCommandName>ptouch</ToolCommandName>
-    <PackAsTool>true</PackAsTool>
-    <IsPackable>true</IsPackable>
+    <PlatformTarget>x86</PlatformTarget>
+    <!--<PackAsTool>true</PackAsTool>
+    <IsPackable>true</IsPackable>-->
   </PropertyGroup>
 
   <ItemGroup>

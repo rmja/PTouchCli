@@ -23,6 +23,9 @@ namespace PTouch.Commands
 
             bpac.Open(Template);
 
+            var mediaId = bpac.GetPrinterMediaId();
+            bpac.SetMediaId(mediaId);
+
             for (var i = 0; i < RemainingArguments.Length; i += 2)
             {
                 var key = RemainingArguments[i];

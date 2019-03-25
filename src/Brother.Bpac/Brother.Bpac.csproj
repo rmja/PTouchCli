@@ -2,11 +2,12 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
 
   <ItemGroup>
     <Reference Include="Interop.bpac">
-      <HintPath>..\..\runtimes\win-x64\native\Interop.bpac.DLL</HintPath>
+      <HintPath>runtimes\win-x86\native\Interop.bpac.DLL</HintPath>
     </Reference>
   </ItemGroup>
 

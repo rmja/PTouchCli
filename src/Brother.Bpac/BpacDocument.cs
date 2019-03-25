@@ -30,12 +30,25 @@ namespace Brother.Bpac
             }
         }
 
+        public int GetPrinterMediaId()
+        {
+            return _doc.Printer.GetMediaId();
+        }
+
+        public void SetMediaId(int mediaId, bool fitPage = false)
+        {
+            if (!_doc.SetMediaById(mediaId, fitPage))
+            {
+                throw new BpacException("Unable to set media");
+            }
+        }
+
         public string GetPrinterName()
         {
             return _doc.GetPrinterName();
         }
 
-        public void SetPrinter(string printerName, bool fitPage)
+        public void SetPrinter(string printerName, bool fitPage = false)
         {
             if (!_doc.SetPrinter(printerName, fitPage))
             {
@@ -45,7 +58,14 @@ namespace Brother.Bpac
 
         public BpacObject GetObject(string objectName)
         {
-            return new BpacObject(_doc.GetObject(objectName));
+            var obj = _doc.GetObject(objectName);
+
+            if (obj == null)
+            {
+                return null;
+            }
+
+            return new BpacObject(obj);
         }
 
         public void StartPrint(string docName = "", PrintOptions options = PrintOptions.Default)
@@ -60,7 +80,12 @@ namespace Brother.Bpac
         {
             if (!_doc.PrintOut(copyCount, (PrintOptionConstants)options))
             {
-                throw new BpacException(_doc.Printer.ErrorString);
+                if (_doc.ErrorCode == 11) // Errorcode found in the SDK Help file
+                {
+                    throw new BpacException("The currently specified printer is not supported - make sure that the 32bit drivers are installed");
+                }
+
+                throw new BpacException($"Unable to print, error code: {_doc.ErrorCode}");
             }
         }
 

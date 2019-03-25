@@ -1,6 +1,7 @@
 ﻿using Brother.Bpac;
 using McMaster.Extensions.CommandLineUtils;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace PTouch.Commands
 {
@@ -21,31 +22,46 @@ namespace PTouch.Commands
 
         public int OnExecute(IConsole console)
         {
-            var bpac = new BpacDocument();
+            var doc = new BpacDocument();
+            var printer = new BpacPrinter();
 
-            if (PrinterName != null)
+            doc.Open(Template);
+
+            var printerName = PrinterName ?? printer.GetInstalledPrinters().FirstOrDefault();
+
+            if (printerName == null)
             {
-                bpac.SetPrinter(PrinterName, fitPage: false);
+                console.Error.WriteLine("No printer found");
+
+                return 1;
             }
 
-            bpac.Open(Template);
+            doc.SetPrinter(printerName);
 
             for (var i = 0; i < RemainingArguments.Length; i += 2)
             {
                 var key = RemainingArguments[i];
                 var value = RemainingArguments[i + 1];
 
-                bpac.GetObject(key).Text = value;
+                var obj = doc.GetObject(key);
+
+                if (obj == null)
+                {
+                    console.Error.WriteLine($"The object '{key}' was not found in the template");
+
+                    return 1;
+                }
+
+                obj.Text = value;
             }
 
-            bpac.StartPrint();
-            bpac.PrintOut(Count);
-            bpac.EndPrint();
+            doc.StartPrint();
+            doc.PrintOut(Count);
+            doc.EndPrint();
 
-            var printerName = bpac.GetPrinterName();
-            console.WriteLine($"{Count} copies were sent to printer '{printerName}'");
+            //console.WriteLine($"{Count} copies were sent to printer '{printerName}'");
 
-            bpac.Close();
+            doc.Close();
 
             return 0;
         }
