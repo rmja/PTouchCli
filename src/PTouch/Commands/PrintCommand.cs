@@ -1,7 +1,9 @@
 ﻿using Brother.Bpac;
 using McMaster.Extensions.CommandLineUtils;
 using System.ComponentModel.DataAnnotations;
+using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace PTouch.Commands
 {
@@ -18,9 +20,12 @@ namespace PTouch.Commands
         [Option("-p|--printer-name")]
         public string PrinterName { get; set; }
 
+        [Option("-d|--database")]
+        public string Database { get; set; }
+
         public string[] RemainingArguments { get; }
 
-        public int OnExecute(IConsole console)
+        public async Task<int> OnExecuteAsync(IConsole console)
         {
             var doc = new BpacDocument();
             var printer = new BpacPrinter();
@@ -55,9 +60,49 @@ namespace PTouch.Commands
                 obj.Text = value;
             }
 
-            doc.StartPrint();
-            doc.PrintOut(Count);
-            doc.EndPrint();
+            if (Database != null)
+            {
+                using (var file = File.OpenText(Database))
+                {
+                    var headerLine = await file.ReadLineAsync();
+                    var headers = headerLine.Split(';');
+
+                    doc.StartPrint("");
+
+                    while (!file.EndOfStream)
+                    {
+                        for (var i = 0; i < headers.Length; i++)
+                        {
+                            var dataLine = await file.ReadLineAsync();
+                            var data = dataLine.Split(';');
+
+                            var key = headers[i];
+                            var value = data[i];
+
+                            var obj = doc.GetObject(key);
+
+                            if (obj == null)
+                            {
+                                console.Error.WriteLine($"The object '{key}' was not found in the template");
+
+                                return 1;
+                            }
+
+                            obj.Text = value;
+                        }
+
+                        doc.PrintOut(Count);
+                    }
+
+                    doc.EndPrint();
+                }
+            }
+            else
+            {
+                doc.StartPrint("");
+                doc.PrintOut(Count);
+                doc.EndPrint();
+            }
 
             //console.WriteLine($"{Count} copies were sent to printer '{printerName}'");
 
