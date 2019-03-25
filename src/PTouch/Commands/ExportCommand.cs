@@ -1,8 +1,8 @@
-﻿using bpac;
+﻿using Brother.Bpac;
 using McMaster.Extensions.CommandLineUtils;
 using System.ComponentModel.DataAnnotations;
 
-namespace PTouchCli.Commands
+namespace PTouch.Commands
 {
     [Command("export", ThrowOnUnexpectedArgument = false)]
     class ExportCommand
@@ -17,33 +17,25 @@ namespace PTouchCli.Commands
 
         public string[] RemainingArguments { get; }
 
-        int OnExecute(IConsole console)
+        public int OnExecute(IConsole console)
         {
-            var document = new DocumentClass();
+            var bpac = new BpacDocument();
 
-            if (!document.Open(Template))
-            {
-                console.WriteLine($"Unable to open template file '{Template}'");
-                return 1;
-            }
+            bpac.Open(Template);
 
             for (var i = 0; i < RemainingArguments.Length; i += 2)
             {
                 var key = RemainingArguments[i];
                 var value = RemainingArguments[i + 1];
 
-                document.GetObject(key).Text = value;
+                bpac.GetObject(key).Text = value;
             }
 
-            if (!document.SaveAs(ExportType.bexLbl, Destination))
-            {
-                console.WriteLine($"Unable to write to file '{Destination}'");
-                document.Close();
-                return 1;
-            }
-
+            bpac.SaveAs(Destination);
             console.WriteLine($"Label was written to file '{Destination}'");
-            document.Close();
+
+            bpac.Close();
+
             return 0;
         }
     }

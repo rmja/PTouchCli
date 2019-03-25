@@ -1,8 +1,8 @@
-﻿using bpac;
+﻿using Brother.Bpac;
 using McMaster.Extensions.CommandLineUtils;
 using System.ComponentModel.DataAnnotations;
 
-namespace PTouchCli.Commands
+namespace PTouch.Commands
 {
     [Command("print", ThrowOnUnexpectedArgument = false)]
     class PrintCommand
@@ -14,32 +14,39 @@ namespace PTouchCli.Commands
         [Option("-n|--count", "The number of copies to print", CommandOptionType.SingleValue)]
         public int Count { get; } = 1;
 
+        [Option("-p|--printer-name")]
+        public string PrinterName { get; set; }
+
         public string[] RemainingArguments { get; }
 
-        int OnExecute(IConsole console)
+        public int OnExecute(IConsole console)
         {
-            var document = new DocumentClass();
+            var bpac = new BpacDocument();
 
-            if (!document.Open(Template))
+            if (PrinterName != null)
             {
-                console.WriteLine($"Unable to open template file '{Template}'");
-                return 1;
+                bpac.SetPrinter(PrinterName, fitPage: false);
             }
+
+            bpac.Open(Template);
 
             for (var i = 0; i < RemainingArguments.Length; i += 2)
             {
                 var key = RemainingArguments[i];
                 var value = RemainingArguments[i + 1];
 
-                document.GetObject(key).Text = value;
+                bpac.GetObject(key).Text = value;
             }
 
-            document.StartPrint(string.Empty, PrintOptionConstants.bpoDefault);
-            document.PrintOut(Count, PrintOptionConstants.bpoDefault);
-            document.EndPrint();
+            bpac.StartPrint();
+            bpac.PrintOut(Count);
+            bpac.EndPrint();
 
-            console.WriteLine($"{Count} copies were sent to printer");
-            document.Close();
+            var printerName = bpac.GetPrinterName();
+            console.WriteLine($"{Count} copies were sent to printer '{printerName}'");
+
+            bpac.Close();
+
             return 0;
         }
     }

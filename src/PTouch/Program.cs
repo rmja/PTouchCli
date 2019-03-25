@@ -6,7 +6,6 @@ namespace PTouch
     [Command("ptouch")]
     [Subcommand(
         typeof(PrintersCommand),
-        typeof(OnlineCommand),
         typeof(ExportCommand),
         typeof(PrintCommand))]
     class Program
