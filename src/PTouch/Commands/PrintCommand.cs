@@ -71,11 +71,11 @@ namespace PTouch.Commands
 
                     while (!file.EndOfStream)
                     {
+                        var dataLine = await file.ReadLineAsync();
+                        var data = dataLine.Split(';');
+
                         for (var i = 0; i < headers.Length; i++)
                         {
-                            var dataLine = await file.ReadLineAsync();
-                            var data = dataLine.Split(';');
-
                             var key = headers[i];
                             var value = data[i];
 
