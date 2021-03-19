@@ -1,4 +1,5 @@
 ﻿using bpac;
+using System;
 using System.Linq;
 
 namespace Brother.Bpac
@@ -14,7 +15,12 @@ namespace Brother.Bpac
 
         public string[] GetInstalledPrinters()
         {
-            return ((object[])_printer.GetInstalledPrinters()).Cast<string>().ToArray();
+            var printers = (object[])_printer.GetInstalledPrinters();
+            if (printers is null)
+            {
+                return Array.Empty<string>();
+            }
+            return printers.Cast<string>().ToArray();
         }
 
         public bool IsPrinterOnline(string printerName)

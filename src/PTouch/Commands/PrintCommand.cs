@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace PTouch.Commands
 {
-    [Command("print", ThrowOnUnexpectedArgument = false)]
+    [Command("print", UnrecognizedArgumentHandling = UnrecognizedArgumentHandling.StopParsingAndCollect)]
     class PrintCommand
     {
         [Argument(0, "template", "The .lbx file to use as template")]

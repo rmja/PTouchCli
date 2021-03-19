@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace PTouch.Commands
 {
-    [Command("export", ThrowOnUnexpectedArgument = false)]
+    [Command("export", UnrecognizedArgumentHandling = UnrecognizedArgumentHandling.StopParsingAndCollect)]
     class ExportCommand
     {
         [Argument(0, "template", "The .lbx file to use as template")]
